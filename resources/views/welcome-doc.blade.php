@@ -59,10 +59,10 @@
                 </div>
                 <nav class="flex items-center space-x-4">
                     <a href="{{ route('login') }}" class="text-sm font-medium text-gray-700 hover:text-indigo-600 transition-colors duration-200 px-3 py-2 rounded-md hover:bg-gray-100">
-                        Entrar
+                        {{ __('Sign In') }}
                     </a>
                     <a href="{{ route('register') }}" class="btn-primary text-sm font-semibold text-white px-6 py-2.5 rounded-lg shadow-lg">
-                        Criar conta
+                        {{ __('Create Account') }}
                     </a>
                 </nav>
             </div>
@@ -82,18 +82,18 @@
             <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center text-white">
                 <div class="max-w-4xl mx-auto">
                     <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-                        Gerencie seus documentos com 
-                        <span class="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">simplicidade</span>
+                        {{ __('Manage your documents with') }}
+                        <span class="bg-gradient-to-r from-yellow-300 to-orange-300 bg-clip-text text-transparent">{{ __('Simplicity') }}</span>
                     </h1>
                     <p class="text-lg md:text-xl max-w-3xl mx-auto text-white/90 mb-10 leading-relaxed">
-                        Crie, edite e baixe seus formulários com segurança, organização e acessibilidade em qualquer dispositivo.
+                        {{ __('Create, edit and download your forms with security, organization and accessibility on any device.') }}
                     </p>
                     <div class="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
                         <a href="{{ route('register') }}" class="btn-primary px-8 py-4 font-semibold rounded-xl shadow-2xl text-center">
-                            Comece agora
+                            {{ __('Start now') }}
                         </a>
                         <a href="#features" class="btn-secondary px-8 py-4 font-medium rounded-xl text-center text-white">
-                            Saiba mais
+                            {{ __('Learn more') }}
                         </a>
                     </div>
                 </div>
@@ -108,7 +108,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                         </svg>
-                        Recursos
+                         {{ __('Learn more') }}
                     </div>
                     <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
                         Tudo que você precisa para gerenciar seus documentos
@@ -161,17 +161,17 @@
             <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
                 <div class="max-w-3xl mx-auto">
                     <h2 class="text-3xl md:text-5xl font-bold text-gray-900 mb-6">
-                        Simplifique agora seu gerenciamento de documentos
+                      {{ __('Simplify your document management now') }}
                     </h2>
                     <p class="text-lg text-gray-600 mb-10 leading-relaxed">
-                        Comece gratuitamente e leve mais organização para sua rotina.
+                        {{ __('Get started for free and bring more organization to your routine.')  }}
                     </p>
                     <div class="flex flex-col sm:flex-row justify-center gap-4 max-w-md mx-auto">
                         <a href="{{ route('register') }}" class="btn-primary px-8 py-4 font-semibold rounded-xl shadow-2xl text-center text-white">
-                            Criar conta grátis
+                            {{ __('Create a free account') }}
                         </a>
                         <a href="#features" class="bg-white border-2 border-gray-200 text-gray-700 hover:border-indigo-300 hover:text-indigo-600 px-8 py-4 font-medium rounded-xl text-center transition-all duration-200">
-                            Ver recursos
+                            {{ __('View resources') }}
                         </a>
                     </div>
                 </div>
