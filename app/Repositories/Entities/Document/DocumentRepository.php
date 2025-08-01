@@ -14,7 +14,7 @@ class DocumentRepository implements IDocumentRepository
         $this->model = new Document();
     }
     
-    public function all(array $params = [])
+    public function allUserDocuments(array $params = [])
     {
         if (!isset($params['search'])) {
             return $this->model
@@ -34,13 +34,9 @@ class DocumentRepository implements IDocumentRepository
             });
     }
 
-    public function findById($id)
+    public function findDocumentById(int $id)
     {
-        return $this->model->where(
-            'user_id', 
-            Auth::id()
-            )
-            ->findOrFail($id);
+        return $this->model->findOrFail($id);
     }
 
     public function create(array $params = [])
@@ -56,7 +52,7 @@ class DocumentRepository implements IDocumentRepository
         try {
             return $this->model->create($params);
         } catch (\Throwable $th) {
-            dd($th->getMessage());
+            \Log::info($th->getMessage());
             return null;
         }
     }

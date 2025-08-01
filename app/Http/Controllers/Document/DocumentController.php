@@ -25,7 +25,7 @@ class DocumentController extends Controller
         $params['user_id'] = Auth::id();
 
         $documents = $this->documentRepository
-            ->all(
+            ->allUserDocuments(
                 $params
             );
 
@@ -63,8 +63,7 @@ class DocumentController extends Controller
         
         // Adiciona o ID do usuário logado
         $params = $request->all();
-        // Converte para decimal padrão se vier como "1.234,56"
-        $params['price'] = floatval(str_replace(['.', ','], ['', '.'], $params['price']));
+        
         $params['user_id'] = Auth::id();
         //dd($params);
 

@@ -101,6 +101,17 @@ services:
             - '/dev/shm:/dev/shm'
         networks:
             - sail
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        container_name: phpmyadmin
+        environment:
+            UPLOAD_LIMIT: 3000M
+            PMA_HOST: mysql
+            PMA_PORT: 3306
+        ports:
+            - "8083:80"
+        networks:
+            - sail
 networks:
     sail:
         driver: bridge
