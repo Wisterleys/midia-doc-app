@@ -6,14 +6,16 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
-        Schema::create('products', function (Blueprint $table) {
+        Schema::create('documents', function (Blueprint $table) {
             $table->id();
+
             $table->foreignId('user_id')->constrained('users');
+            $table->string('user_name');
+            $table->string('user_document');
+            $table->string('user_role');
+
             $table->string('brand');
             $table->string('model');
             $table->string('serial_number');
@@ -22,17 +24,16 @@ return new class extends Migration
             $table->string('disk');
             $table->decimal('price', 10, 2);
             $table->string('price_string');
+
             $table->string('local');
             $table->date('date');
+
             $table->timestamps();
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('products');
+        Schema::dropIfExists('documents');
     }
 };

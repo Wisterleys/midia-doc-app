@@ -13,19 +13,11 @@ class RepositoryServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Product
+        // Document
         $this->app->bind(
-            \App\Repositories\Contracts\Product\IProductRepository::class,
-            \App\Repositories\Entities\ProductRepository::class
+            \App\Repositories\Contracts\Document\IDocumentRepository::class,
+            \App\Repositories\Entities\Document\DocumentRepository::class
         );
-        
-        // Person
-        $this->app->bind(
-            \App\Repositories\Contracts\Person\IPersonRepository::class,
-            \App\Repositories\Entities\PersonRepository::class
-        );
-        
-        // Adicione outros bindings de repositories aqui conforme necessário
     }
 
     /**

@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use App\Models\Person;
-use App\Observers\PersonObserver;
+use App\Models\Document;
+use App\Observers\DocumentObserver;
 
 class ObserverServiceProvider extends ServiceProvider
 {
@@ -21,6 +21,6 @@ class ObserverServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Person::observe(PersonObserver::class);
+        Document::observe(DocumentObserver::class);
     }
 }
