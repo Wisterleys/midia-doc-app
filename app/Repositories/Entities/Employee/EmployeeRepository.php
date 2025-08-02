@@ -1,25 +1,25 @@
 <?php
 
-namespace App\Repositories\Entities\Document;
+namespace App\Repositories\Entities\Employee;
 
-use App\Models\Document;
-use App\Repositories\Contracts\Document\IDocumentRepository;
+use App\Models\Employee;
+use App\Repositories\Contracts\Employee\IEmployeeRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Builder;
 
-class DocumentRepository implements IDocumentRepository
+class EmployeeRepository implements IEmployeeRepository
 {
     protected $model;
 
     public function __construct()
     {
-        $this->model = new Document();
+        $this->model = new Employee();
     }
     
-    public function allUserDocuments(array $params = []): Builder
+    public function allUserEmployees(array $params = []): Builder
     {
         $query = $this->model::select([
-            'documents.id', 'documents.employee_id', 'documents.notebook_id', 'documents.local', 'documents.date',
+            'employees.id', 'employees.employee_id', 'employees.notebook_id', 'employees.local', 'employees.date',
             'employees.name as employee_name', 'employees.cpf as employee_cpf', 'employees.role as employee_role',
             'notebooks.brand as notebook_brand', 'notebooks.model as notebook_model', 'notebooks.serial_number as notebook_serial_number'
         ]);
@@ -32,8 +32,8 @@ class DocumentRepository implements IDocumentRepository
                 $q->where('id', $params['user_id']);
         });
 
-        $query->join('employees', 'documents.employee_id', '=', 'employees.id')
-              ->join('notebooks', 'documents.notebook_id', '=', 'notebooks.id');
+        $query->join('employees', 'employees.employee_id', '=', 'employees.id')
+              ->join('notebooks', 'employees.notebook_id', '=', 'notebooks.id');
         
         if (isset($params['search'])) {
             $search_term = $params['search'];
@@ -56,13 +56,13 @@ class DocumentRepository implements IDocumentRepository
             });
         }
 
-        $query->orderBy('documents.date', 'desc');
-        $query->orderBy('documents.id', 'desc');
+        $query->orderBy('employees.date', 'desc');
+        $query->orderBy('employees.id', 'desc');
 
         return $query;
     }
 
-    public function findDocumentById(int $id)
+    public function findEmployeeById(int $id)
     {
         return $this->model->findOrFail($id);
     }
@@ -91,14 +91,14 @@ class DocumentRepository implements IDocumentRepository
             return null;
         }
 
-        $document = $this->find($id);
+        $employee = $this->find($id);
 
-        if (is_null($document)) {
+        if (is_null($employee)) {
             return null;
         }
 
-        $document->update($data);
-        return $document;
+        $employee->update($data);
+        return $employee;
     }
 
     public function delete($id)
@@ -107,13 +107,13 @@ class DocumentRepository implements IDocumentRepository
             return null;
         }
 
-        $document = $this->find($id);
+        $employee = $this->find($id);
 
-        if (is_null($document)) {
+        if (is_null($employee)) {
             return null;
         }
 
-        return $document->delete();
+        return $employee->delete();
     }
 
 }

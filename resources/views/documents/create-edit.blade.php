@@ -268,6 +268,42 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Informações dos Acessórios -->
+            <div class="form-section bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                <div class="bg-gradient-to-r from-pink-500/10 to-purple-500/10 px-6 py-4 border-b border-gray-100">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2 bg-gradient-to-br from-pink-500 to-purple-600 rounded-lg">
+                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">Acessórios</h3>
+                            <p class="text-sm text-gray-600">Informe os acessórios do equipamento</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6 space-y-6">
+                    <div id="accessories-list">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 accessory-item mb-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Nome *</label>
+                                <input type="text" name="accessories[0][name]" class="input-focus w-full px-4 py-3 border border-gray-300 rounded-xl" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Descrição</label>
+                                <input type="text" name="accessories[0][description]" class="input-focus w-full px-4 py-3 border border-gray-300 rounded-xl">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Marca</label>
+                                <input type="text" name="accessories[0][brand]" class="input-focus w-full px-4 py-3 border border-gray-300 rounded-xl">
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addAccessory()" class="btn-primary px-4 py-2 rounded-xl text-white font-semibold shadow">Adicionar Acessório</button>
+                </div>
+            </div>
         </div>
 
         <div class="lg:col-span-1">
@@ -472,6 +508,29 @@
                 }
             }
         });
+
+        let accessoryIndex = 1;
+        function addAccessory() {
+            const list = document.getElementById('accessories-list');
+            const item = document.createElement('div');
+            item.className = 'grid grid-cols-1 md:grid-cols-3 gap-6 accessory-item mb-4';
+            item.innerHTML = `
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Nome *</label>
+                    <input type="text" name="accessories[${accessoryIndex}][name]" class="input-focus w-full px-4 py-3 border border-gray-300 rounded-xl" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Descrição</label>
+                    <input type="text" name="accessories[${accessoryIndex}][description]" class="input-focus w-full px-4 py-3 border border-gray-300 rounded-xl">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Marca</label>
+                    <input type="text" name="accessories[${accessoryIndex}][brand]" class="input-focus w-full px-4 py-3 border border-gray-300 rounded-xl">
+                </div>
+            `;
+            list.appendChild(item);
+            accessoryIndex++;
+        }
 
         // Initialize preview on page load if editing
         document.addEventListener('DOMContentLoaded', function() {
