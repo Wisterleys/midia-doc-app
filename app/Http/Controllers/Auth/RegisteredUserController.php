@@ -11,9 +11,18 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use App\Repositories\Contracts\Employee\IEmployeeRepository;
 
 class RegisteredUserController extends Controller
 {
+
+    private IEmployeeRepository $employeeRepository;
+
+    public function __construct(IEmployeeRepository $employeeRepository)
+    {
+        $this->employeeRepository = $employeeRepository;
+    }
+
     /**
      * Display the registration view.
      */
@@ -32,6 +41,8 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'cpf' => ['required', 'string', 'cpf', 'unique:employees,cpf'],
+            'role' => ['required', 'string'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
@@ -44,6 +55,13 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        $this->employeeRepository->create([
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'cpf' => $request->cpf,
+            'role' => $request->role,
+        ]);
 
         return redirect(route('dashboard', absolute: false));
     }

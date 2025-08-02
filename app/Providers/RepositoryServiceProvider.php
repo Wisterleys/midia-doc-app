@@ -18,6 +18,12 @@ class RepositoryServiceProvider extends ServiceProvider
             \App\Repositories\Contracts\Document\IDocumentRepository::class,
             \App\Repositories\Entities\Document\DocumentRepository::class
         );
+
+        // Employee
+        $this->app->bind(
+            \App\Repositories\Contracts\Employee\IEmployeeRepository::class,
+            \App\Repositories\Entities\Employee\EmployeeRepository::class
+        );
     }
 
     /**

@@ -2,29 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Document extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
-        'user_id',
-        'user_name',
-        'user_document',
-        'user_role',
-        'brand',
-        'model',
-        'serial_number',
-        'processor',
-        'memory',
-        'disk',
-        'price',
-        'price_string',
-        'local',
-        'date',
+        'employee_id', 'notebook_id', 'local', 'date'
     ];
 
-    public function user()
+    public function employee()
     {
-        return $this->belongsTo(\App\Models\User::class);
+        return $this->belongsTo(\App\Models\Employee::class);
+    }
+
+    public function notebook()
+    {
+        return $this->belongsTo(\App\Models\Notebook::class);
     }
 }
+
