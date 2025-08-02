@@ -8,9 +8,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use App\Repositories\Contracts\Employee\IEmployeeRepository;
 
 class ProfileController extends Controller
 {
+    private IEmployeeRepository $employeeRepository;
+
+    public function __construct(IEmployeeRepository $employeeRepository)
+    {
+        $this->employeeRepository = $employeeRepository;
+    }
+
     /**
      * Display the user's profile form.
      */
@@ -33,6 +41,17 @@ class ProfileController extends Controller
         }
 
         $request->user()->save();
+
+        if (isset($request->user()->employee->id)) {
+            $this->employeeRepository->update(
+                $request->user()->employee->id,
+                [
+                    'name' => $request->name,
+                    'cpf' => $request->cpf,
+                    'role' => $request->role,
+                ]
+            );
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }

@@ -46,8 +46,8 @@ class User extends Authenticatable
         ];
     }
 
-    public function person()
+    public function employee()
     {
-        return $this->hasOne(\App\Models\Person::class);
+        return $this->hasOne(\App\Models\Employee::class);
     }
 }
