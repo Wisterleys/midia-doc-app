@@ -26,4 +26,23 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+                const mask={
+                cpf(value){
+                    return value.replace(/\D/g,'')
+                    .replace(/([\d]{3})(\d)/,'$1.$2')
+                    .replace(/([\d]{3})(\d)/,'$1.$2')
+                    .replace(/([\d]{3})(\d{1,2})/,'$1-$2')
+                    .replace(/(-[\d]{2})\d+?$/,'$1')
+                }
+            }
+
+            document.getElementById('cpf').addEventListener("input",$input=>{
+                const camp=$input.target.dataset.mask
+                $input.target.value= mask[camp]($input.target.value)
+            });
+        });
+    </script>
 </x-app-layout>

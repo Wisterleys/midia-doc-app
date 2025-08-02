@@ -19,55 +19,43 @@ class EmployeeRepository implements IEmployeeRepository
     public function allUserEmployees(array $params = []): Builder
     {
         $query = $this->model::select([
-            'employees.id', 'employees.employee_id', 'employees.notebook_id', 'employees.local', 'employees.date',
-            'employees.name as employee_name', 'employees.cpf as employee_cpf', 'employees.role as employee_role',
-            'notebooks.brand as notebook_brand', 'notebooks.model as notebook_model', 'notebooks.serial_number as notebook_serial_number'
+            'id', 
+            'name', 
+            'cpf', 
+            'role'
         ]);
 
-        if (!isset($params['user_id'])) {
-            return new Builder();
+        if (isset($params['user_id'])) {
+            $query->where('user_id', $params['user_id']);
+            $query->where('user_id', $params['user_id']);
         }
 
-        $query->whereHas('employee.user', function (Builder $q) use ($params) {
-                $q->where('id', $params['user_id']);
-        });
-
-        $query->join('employees', 'employees.employee_id', '=', 'employees.id')
-              ->join('notebooks', 'employees.notebook_id', '=', 'notebooks.id');
-        
         if (isset($params['search'])) {
             $search_term = $params['search'];
 
             $query->where(function (Builder $q) use ($search_term) {
-                $q->where('local', 'like', "%{$search_term}%")
-                  ->orWhere(function (Builder $date_query) use ($search_term) {
-                      $date_query->whereDate('date', $search_term);
-                    })
-                    ->orWhereHas('notebook', function (Builder $notebook_query) use ($search_term) {
-                        $notebook_query->where('brand', 'like', "%{$search_term}%")
-                                       ->orWhere('model', 'like', "%{$search_term}%")
-                                       ->orWhere('serial_number', 'like', "%{$search_term}%");
-                    })
-                    ->orWhereHas('employee', function (Builder $employee_query) use ($search_term) {
-                        $employee_query->where('cpf', 'like', "%{$search_term}%")
-                                      ->orWhere('name', 'like', "%{$search_term}%")
-                                      ->orWhere('role', 'like', "%{$search_term}%");
-                  });
+                $q->where('name', 'like', "%{$search_term}%")
+                ->orWhere('cpf', 'like', "%{$search_term}%")
+                ->orWhere('role', 'like', "%{$search_term}%");
             });
         }
 
-        $query->orderBy('employees.date', 'desc');
-        $query->orderBy('employees.id', 'desc');
+        $query->orderBy('name', 'asc'); // Ou outro campo de ordenação relevante
 
         return $query;
     }
 
-    public function findEmployeeById(int $id)
+    public function findEmployeeById(int $id): ?Employee
     {
-        return $this->model->findOrFail($id);
+        try {
+            return $this->model->findOrFail($id);
+        } catch (\Throwable $th) {
+            \Log::info($th->getMessage());
+            return null;
+        }
     }
 
-    public function create(array $params = [])
+    public function create(array $params = []): ?Employee
     {
         if (empty($params)) {
             return null;
@@ -85,32 +73,38 @@ class EmployeeRepository implements IEmployeeRepository
         }
     }
 
-    public function update(int $id)
+    public function update(?int $id, array $data = []): ?Employee
     {
-        if (is_null($id)) {
+        if (is_null($id) || empty($data)) {
             return null;
         }
 
-        $employee = $this->find($id);
+        try {
+            $employee = $this->model->find($id);
+            if (is_null($employee)) {
+                return null;
+            }
 
-        if (is_null($employee)) {
+            $employee->update($data);
+            return $employee;
+        } catch (\Throwable $th) {
+            \Log::info($th->getMessage());
             return null;
         }
-
-        $employee->update($data);
-        return $employee;
     }
 
-    public function delete($id)
+    public function delete($id): bool
     {
         if (is_null($id)) {
-            return null;
+            return false;
         }
 
-        $employee = $this->find($id);
+        $employee = $this->findEmployeeById(
+                $id
+            );
 
         if (is_null($employee)) {
-            return null;
+            return false;
         }
 
         return $employee->delete();
