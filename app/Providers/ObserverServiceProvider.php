@@ -9,11 +9,13 @@ use App\Models\Employee;
 use App\Models\Notebook;
 use App\Models\Document;
 use App\Models\Accessory;
+use App\Models\User;
 
 use App\Observers\EmployeeObserver;
 use App\Observers\NotebookObserver;
 use App\Observers\DocumentObserver;
 use App\Observers\AccessoryObserver;
+use App\Observers\UserObserver;
 
 class ObserverServiceProvider extends ServiceProvider
 {
@@ -34,5 +36,6 @@ class ObserverServiceProvider extends ServiceProvider
         Notebook::observe(NotebookObserver::class);
         Document::observe(DocumentObserver::class);
         Accessory::observe(AccessoryObserver::class);
+        User::observe(UserObserver::class);
     }
 }

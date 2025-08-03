@@ -1,0 +1,271 @@
+<?php
+
+namespace Tests\Unit\Repositories\Document;
+
+use App\Models\Document;
+use App\Models\Employee;
+use App\Models\Notebook;
+use App\Models\User;
+use App\Repositories\Entities\Document\DocumentRepository;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class DocumentRepositoryTest extends TestCase
+{
+    use RefreshDatabase;
+
+    protected DocumentRepository $repository;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->seedTestUser();
+        $this->seedTestNotebook();
+        $this->repository = new DocumentRepository();
+    }
+
+    public function testDocumentCreateWithValidData()
+    {
+        $user = User::first();
+        $employee = Employee::factory()
+            ->create(
+                ['user_id' => $user->id]
+            );
+        $notebook = $this->allNotebooks()->first();
+
+        $data = [
+            'employee_id' => $employee->id,
+            'notebook_id' => $notebook->id,
+            'local' => 'Departamento de TI',
+            'date' => now(),
+            'user_id' => $user->id,
+        ];
+
+        $document = $this->repository->create($data);
+
+        $this->assertInstanceOf(
+            Document::class, 
+            $document
+        );
+        $this->assertEquals(
+            'Departamento de TI', 
+            $document->local
+        );
+        $this->assertEquals(
+            $employee->id, 
+            $document->employee_id
+        );
+        $this->assertEquals(
+            $notebook->id, 
+            $document->notebook_id
+        );
+    }
+
+    public function testDocumentCreateReturnsNullWhenDataIsEmpty()
+    {
+        $result = $this->repository->create([]);
+        $this->assertNull($result);
+    }
+
+    public function testDocumentCreateReturnsNullWhenUserIdMissing()
+    {
+        $data = [
+            'employee_id' => 1,
+            'notebook_id' => 1,
+            'local' => 'TI',
+            'date' => now(),
+        ];
+
+        $result = $this->repository
+            ->create(
+                $data
+            );
+        $this->assertNull(
+            $result
+        );
+    }
+
+    public function testFindDocumentByIdReturnsCorrectDocument()
+    {
+        $this->testDocumentCreateWithValidData();
+
+        $document = Document::first();
+        $found = $this->repository
+            ->findDocumentById(
+                $document->id
+            );
+
+        $this->assertEquals(
+            $document->id, 
+            $found->id
+        );
+    }
+
+    public function testDeleteExistingDocument()
+    {
+        $this->testDocumentCreateWithValidData();
+
+        $document = Document::first();
+        $result = $this->repository
+            ->delete(
+                $document->id
+            );
+
+        $this->assertTrue(
+            $result
+        );
+        $this->assertDatabaseMissing(
+            'documents', 
+            ['id' => $document->id]
+        );
+    }
+
+    public function testDeleteNonExistentDocumentReturnsFalse()
+    {
+        $result = $this->repository->delete(999999);
+        $this->assertFalse(
+            $result
+        );
+    }
+
+    public function testAllUserDocumentsReturnsBuilderInstance()
+    {
+        $user = User::first();
+        $builder = $this->repository
+            ->allUserDocuments(
+                ['user_id' => $user->id]
+            );
+        $this->assertInstanceOf(
+            \Illuminate\Database\Eloquent\Builder::class, 
+            $builder
+        );
+    }
+
+    public function testAllUserDocumentsWithoutUserIdReturnsEmptyBuilder()
+    {
+        $result = $this->repository->allUserDocuments();
+        $this->assertNull(
+            $result
+        );
+    }
+
+    public function testAllUserDocumentsWithSearchFilter()
+    {
+        $employee = Employee::factory()
+            ->for(User::factory()->create(['name' => 'John Doe']))
+            ->create([
+                'name' => 'Diego Osinski',
+                'cpf' => '818.232.483-06',
+                'role' => 'analista'
+            ]);
+
+        $notebook = Notebook::factory()->create([
+            'brand' => 'Dell',
+            'model' => 'XPS 15',
+            'serial_number' => 'SN123456'
+        ]);
+
+        $documents = Document::factory()
+            ->count(3)
+            ->for($employee)
+            ->for($notebook)
+            ->sequence(
+                ['local' => 'Sala 101', 'date' => '2024-09-30'],
+                ['local' => 'Sala 202', 'date' => '2025-01-11'],
+                ['local' => 'Remoto', 'date' => '2024-12-28']
+            )
+            ->create();
+
+        $results = $this->repository->allUserDocuments([
+            'user_id' => $employee->user_id,
+            'search' => 'Sala 101'
+        ])->get();
+
+        $this->assertCount(
+            1, 
+            $results
+        );
+        $this->assertEquals(
+            'Sala 101', 
+            $results->first()->local
+        );
+
+        $results = $this->repository->allUserDocuments([
+            'user_id' => $employee->user_id,
+            'search' => '2025-01-11 00:00:00'
+        ])->get();
+
+        $this->assertCount(
+            1, 
+            $results
+        );
+        $this->assertEquals(
+            '2025-01-11 00:00:00', 
+            $results->first()->date
+        );
+
+        $results = $this->repository->allUserDocuments([
+            'user_id' => $employee->user_id,
+            'search' => 'Diego'
+        ])->get();
+
+        $this->assertCount(3, $results);
+
+        $results = $this->repository->allUserDocuments([
+            'user_id' => $employee->user_id,
+            'search' => '818.232.483-06'
+        ])->get();
+
+        $this->assertCount(
+            3, 
+            $results
+        );
+
+        $results = $this->repository->allUserDocuments([
+            'user_id' => $employee->user_id,
+            'search' => 'analista'
+        ])->get();
+
+        $this->assertCount(
+            3, 
+            $results
+        );
+
+        $results = $this->repository->allUserDocuments([
+            'user_id' => $employee->user_id,
+            'search' => 'Dell'
+        ])->get();
+
+        $this->assertCount(
+            3, 
+            $results
+        );
+
+        $results = $this->repository->allUserDocuments([
+            'user_id' => $employee->user_id,
+            'search' => 'XPS'
+        ])->get();
+
+        $this->assertCount(
+            3, 
+            $results
+        );
+
+        $results = $this->repository->allUserDocuments([
+            'user_id' => $employee->user_id,
+            'search' => 'SN123456'
+        ])->get();
+
+        $this->assertCount(
+            3, 
+            $results
+        );
+
+        $results = $this->repository->allUserDocuments([
+            'user_id' => $employee->user_id,
+            'search' => ''
+        ])->get();
+
+        $this->assertCount(3, $results);
+    }
+}

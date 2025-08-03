@@ -16,7 +16,7 @@ class DocumentRepository implements IDocumentRepository
         $this->model = new Document();
     }
     
-    public function allUserDocuments(array $params = []): Builder
+    public function allUserDocuments(array $params = []): ?Builder
     {
         $query = $this->model::select([
             'documents.id', 'documents.employee_id', 'documents.notebook_id', 'documents.local', 'documents.date',
@@ -25,7 +25,7 @@ class DocumentRepository implements IDocumentRepository
         ]);
 
         if (!isset($params['user_id'])) {
-            return new Builder();
+            return null;
         }
 
         $query->whereHas('employee.user', function (Builder $q) use ($params) {
@@ -64,7 +64,11 @@ class DocumentRepository implements IDocumentRepository
 
     public function findDocumentById(int $id)
     {
-        return $this->model->findOrFail($id);
+        try {
+            return $this->model->findOrFail($id);
+        } catch (\Throwable $th) {
+            return null;
+        }
     }
 
     public function create(array $params = [])
@@ -101,16 +105,18 @@ class DocumentRepository implements IDocumentRepository
         return $document;
     }
 
-    public function delete($id)
+    public function delete($id): bool
     {
         if (is_null($id)) {
-            return null;
+            return false;
         }
 
-        $document = $this->find($id);
+        $document = $this->findDocumentById(
+                $id
+            );
 
         if (is_null($document)) {
-            return null;
+            return false;
         }
 
         return $document->delete();

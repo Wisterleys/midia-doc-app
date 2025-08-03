@@ -207,7 +207,7 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">CPF</label>
-                            <input type="text" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="000.000.000-00">
+                            <input type="text" data-mask="cpf" class="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-all duration-200" placeholder="000.000.000-00">
                         </div>
                         <div class="flex items-end space-x-2">
                             <button type="submit" class="btn-primary flex-1 px-6 py-3 font-semibold text-white rounded-xl shadow-lg">
@@ -522,5 +522,32 @@
             </div>
         </main>
     </div>
+    <script>
+        function applyMasks() {
+            const masks = {
+                    cpf(value){
+                        return value.replace(/\D/g,'')
+                        .replace(/([\d]{3})(\d)/,'$1.$2')
+                        .replace(/([\d]{3})(\d)/,'$1.$2')
+                        .replace(/([\d]{3})(\d{1,2})/,'$1-$2')
+                        .replace(/(-[\d]{2})\d+?$/,'$1')
+                    }
+            };
+
+            document.querySelectorAll('[data-mask]').forEach(input => {
+                input.addEventListener('input', (e) => {
+                    const maskType = e.target.dataset.mask;
+                    if (masks[maskType]) {
+                        const position = e.target.selectionEnd;
+                        e.target.value = masks[maskType](e.target.value);
+                        e.target.setSelectionRange(position, position);
+                    }
+                });
+            });
+        }
+        document.addEventListener('DOMContentLoaded', () => {
+            applyMasks();
+        });
+    </script>
 </body>
 </html>

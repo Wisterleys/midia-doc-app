@@ -3,17 +3,31 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use App\Repositories\Entities\Employee\EmployeeRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class ProfileTest extends TestCase
 {
     use RefreshDatabase;
+    protected EmployeeRepository $employeeRepository;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->employeeRepository = new EmployeeRepository();
+    }
 
     public function test_profile_page_is_displayed(): void
     {
         $user = User::factory()->create();
-
+        $this->employeeRepository->create([
+            'user_id' => $user->id,
+            'name' => 'Test User',
+            'cpf' => '123.456.789-00',
+            'role' => 'developer'
+        ]);
+        
         $response = $this
             ->actingAs($user)
             ->get('/profile');
