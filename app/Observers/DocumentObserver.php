@@ -3,54 +3,53 @@
 namespace App\Observers;
 
 use App\Models\Document;
+use App\Repositories\Contracts\Notebook\INotebookRepository;
 
 class DocumentObserver
 {
+    protected INotebookRepository $notebookRepository;
+
+    public function __construct(INotebookRepository $notebookRepository)
+    {
+        $this->notebookRepository = $notebookRepository;
+    }
+
     public function retrieved(Document $model): void
     {
-/*         if (
-            !is_null($model->id)
-            && !is_null($model->price)
-        ) {
-            $model->price = 'R$ ' . number_format($model->price, 2, ',', '.');
-            \Log::info("Documento listado: " . json_encode($model->toArray()));
-        } */
+        //
     }
 
     public function creating(Document $model): void
     {
-        $this->normalizePrice($model);
+        //
     }
 
     public function created(Document $model): void
     {
-        // Exemplo: Registrar atividade no log ou notificar o usuário
-        \Log::info("Novo documento criado: " . json_encode($model->toArray()));
+       //
     }
 
     public function updating(Document $model): void
     {
-        $this->normalizePrice($model);
+        //
     }
 
     public function deleted(Document $model): void
     {
-        // Exemplo: Limpar cache ou registros relacionados
-        \Log::info("Documento deletado: {$model->id}");
+        //
     }
 
-    private function normalizePrice(Document $model): void
+    public function deleting(Document $model): void
     {
-        if (is_null($model->price)) {
-            return;
-        }
+        if (isset($document->notebook_id)) {
+            $notebook = $this->notebookRepository
+                ->findNotebookById(
+                    $notebook_id
+                );
 
-        if (is_numeric($model->price)) {
-            return;
+            if (!is_null($notebook)) {
+                $notebook->accessories()->sync([]);
+            }
         }
-
-        $model->price = floatval(
-            str_replace(['R$', ' ', '.', ','], ['', '', '', '.'], $model->price)
-        );
     }
 }
