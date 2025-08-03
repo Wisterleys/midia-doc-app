@@ -18,12 +18,12 @@ class ProfileUpdateRequest extends FormRequest
         return [
             'name' => ['required', 'string', 'max:255'],
             'cpf' => [
-                'required', 
+                'sometimes', 
                 'string', 
                 'cpf', 
                 Rule::unique('employees', 'cpf')->ignore($this->user()->employee->id ?? null)
             ],
-            'role' => ['required', 'string'],
+            'role' => ['string'],
             'email' => [
                 'required',
                 'string',

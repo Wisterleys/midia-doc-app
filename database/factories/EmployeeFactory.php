@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Employee;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -14,11 +15,14 @@ class EmployeeFactory extends Factory
 
     public function definition(): array
     {
+        $user = User::factory()->create();
+
         return [
-            'user_id' => $this->faker->randomNumber(3),
+            'user_id' => $user->id,
             'name' => $this->faker->name(),
             'cpf' => $this->faker->numerify('###.###.###-##'),
             'role' => $this->faker->randomElement(['analista', 'gerente', 'estagiario', 'admin']),
+            'ativo' => 1
         ];
     }
 }
