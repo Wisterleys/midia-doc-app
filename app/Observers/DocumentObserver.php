@@ -3,10 +3,17 @@
 namespace App\Observers;
 
 use App\Models\Document;
-use App\Models\Accessory;
+use App\Repositories\Contracts\Notebook\INotebookRepository;
 
 class DocumentObserver
 {
+    protected INotebookRepository $notebookRepository;
+
+    public function __construct(INotebookRepository $notebookRepository)
+    {
+        $this->notebookRepository = $notebookRepository;
+    }
+
     public function retrieved(Document $model): void
     {
         //
@@ -30,5 +37,19 @@ class DocumentObserver
     public function deleted(Document $model): void
     {
         //
+    }
+
+    public function deleting(Document $model): void
+    {
+        if (isset($document->notebook_id)) {
+            $notebook = $this->notebookRepository
+                ->findNotebookById(
+                    $notebook_id
+                );
+
+            if (!is_null($notebook)) {
+                $notebook->accessories()->sync([]);
+            }
+        }
     }
 }
