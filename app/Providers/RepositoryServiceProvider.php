@@ -24,6 +24,12 @@ class RepositoryServiceProvider extends ServiceProvider
             \App\Repositories\Contracts\Employee\IEmployeeRepository::class,
             \App\Repositories\Entities\Employee\EmployeeRepository::class
         );
+
+        // Notebook
+        $this->app->bind(
+            \App\Repositories\Contracts\Notebook\INotebookRepository::class,
+            \App\Repositories\Entities\Notebook\NotebookRepository::class
+        );
     }
 
     /**

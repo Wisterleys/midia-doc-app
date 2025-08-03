@@ -5,6 +5,7 @@ namespace Tests\Unit\Repositories\Document;
 use App\Models\Document;
 use App\Models\Employee;
 use App\Models\Notebook;
+use App\Models\Accessory;
 use App\Models\User;
 use App\Repositories\Entities\Document\DocumentRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -21,6 +22,7 @@ class DocumentRepositoryTest extends TestCase
         parent::setUp();
         $this->seedTestUser();
         $this->seedTestNotebook();
+        $this->seedTestAccessory();
         $this->repository = new DocumentRepository();
     }
 
@@ -267,5 +269,255 @@ class DocumentRepositoryTest extends TestCase
         ])->get();
 
         $this->assertCount(3, $results);
+    }
+
+    public function testDocumentSyncAccessoriesOnCreate()
+    {
+        $user = User::first();
+        $employee = Employee::factory()->create(['user_id' => $user->id]);
+        $notebook = Notebook::factory()->create();
+
+        $accessories = $this->allAccessories()->slice(0, 3);
+        
+        $data = [
+            'employee_id' => $employee->id,
+            'notebook_id' => $notebook->id,
+            'local' => 'Sala de Testes',
+            'date' => now(),
+            'user_id' => $user->id,
+            'accessories_ids' => $accessories->pluck('id')->toArray()
+        ];
+
+        
+        $document = $this->repository
+            ->create(
+                $data
+            );
+
+        $this->assertCount(
+            3, 
+            $notebook->fresh()->accessories
+        );
+        $this->assertEquals(
+            $accessories->pluck('id')->sort()->values()->toArray(),
+            $notebook->fresh()->accessories->pluck('id')->sort()->values()->toArray()
+        );
+    }
+
+    public function testDocumentSyncAccessoriesOnUpdate()
+    {
+        $user = User::first();
+        $employee = Employee::factory()->create(['user_id' => $user->id]);
+        $notebook = Notebook::factory()->create();
+        
+        $initial_accessories = Accessory::factory()->count(2)->create();
+        
+        $data = [
+            'employee_id' => $employee->id,
+            'notebook_id' => $notebook->id,
+            'user_id' => $user->id,
+            'local' => 'Sala de Testes',
+            'date' => now(),
+            'accessories_ids' => $initial_accessories->pluck('id')->toArray()
+        ];
+
+        $document = $this->repository
+            ->create(
+                $data
+            );
+
+        $this->assertCount(
+            2, 
+            $notebook->fresh()->accessories
+        );
+
+        $new_accessories = Accessory::factory()->count(3)->create();
+
+        $updated_data = [
+            'accessories_ids' => $new_accessories->pluck('id')->toArray()
+        ];
+
+        $this->repository->update(
+            $document->id, 
+            $updated_data
+        );
+
+        $this->assertCount(
+            3, 
+            $notebook->fresh()->accessories
+        );
+        $this->assertEquals(
+            $new_accessories->pluck('id')->sort()->values()->toArray(),
+            $notebook->fresh()->accessories->pluck('id')->sort()->values()->toArray()
+        );
+    }
+
+    public function testDocumentRemovesUnusedAccessoriesOnUpdate()
+    {
+        $user = User::first();
+        $employee = Employee::factory()->create(['user_id' => $user->id]);
+        $notebook = Notebook::factory()->create();
+        
+        
+        $accessories = Accessory::factory()->count(4)->create();
+        
+        $data = [
+            'employee_id' => $employee->id,
+            'notebook_id' => $notebook->id,
+            'user_id' => $user->id,
+            'local' => 'Sala de Testes',
+            'date' => now(),
+            'accessories_ids' => $accessories->pluck('id')->toArray()
+        ];
+
+        $document = $this->repository
+            ->create(
+                $data
+            );
+
+        $this->assertCount(
+            4, 
+            $notebook->fresh()->accessories
+        );
+
+        $updated_data = [
+            'accessories_ids' => $accessories->take(2)->pluck('id')->toArray()
+        ];
+
+        $this->repository->update(
+            $document->id, 
+            $updated_data
+        );
+
+        $this->assertCount(
+            2, 
+            $notebook->fresh()->accessories
+        );
+        $this->assertEquals(
+            $accessories->take(2)->pluck('id')->sort()->values()->toArray(),
+            $notebook->fresh()->accessories->pluck('id')->sort()->values()->toArray()
+        );
+    }
+
+    public function testDocumentDoesNotSyncAccessoriesWhenIdsNotProvided()
+    {
+        $user = User::first();
+        $employee = Employee::factory()->create(['user_id' => $user->id]);
+        $notebook = Notebook::factory()->create();
+        
+        $data = [
+            'employee_id' => $employee->id,
+            'notebook_id' => $notebook->id,
+            'local' => 'Sala de Testes',
+            'date' => now(),
+            'user_id' => $user->id
+        ];
+
+        $document = $this->repository
+            ->create(
+                $data
+            );
+
+        $this->assertCount(
+            0, 
+            $notebook->fresh()->accessories
+        );
+    }
+
+    public function testDocumentDoesNotSyncAccessoriesWhenNotebookIdNotProvided()
+    {
+        $user = User::first();
+        $employee = Employee::factory()->create(['user_id' => $user->id]);
+        
+        $accessories = Accessory::factory()->count(2)->create();
+        
+        $data = [
+            'employee_id' => $employee->id,
+            'local' => 'Sala de Testes',
+            'date' => now(),
+            'user_id' => $user->id,
+            'accessories_ids' => $accessories->pluck('id')->toArray()
+        ];
+
+        $document = $this->repository->create($data);
+
+        $this->assertNull(
+            $document
+        );
+    }
+
+    public function testUserCanOnlySeeTheirOwnDocuments()
+    {
+        $user1 = User::factory()->create();
+        $user2 = User::factory()->create();
+        
+        $employee1 = Employee::factory()->create(['user_id' => $user1->id]);
+        $employee2 = Employee::factory()->create(['user_id' => $user2->id]);
+        
+        $notebook = Notebook::factory()->create();
+        
+        Document::factory()
+            ->count(3)
+            ->create([
+                'employee_id' => $employee1->id,
+                'notebook_id' => $notebook->id
+            ]);
+        
+        Document::factory()
+            ->count(2)
+            ->create([
+                'employee_id' => $employee2->id,
+                'notebook_id' => $notebook->id
+            ]);
+        
+        $employee1_documents = $this->repository
+            ->allUserDocuments(['user_id' => $user1->id])
+            ->get();
+        
+        $this->assertCount(
+            3, 
+            $employee1_documents
+        );
+        $this->assertTrue(
+                $employee1_documents->every(function ($document) use ($employee1) {
+                return $document->employee_id === $employee1->id;
+            })
+        );
+        
+        $employee2_documents = $this->repository
+            ->allUserDocuments(
+                ['user_id' => $user2->id]
+            )
+            ->get();
+        
+        $this->assertCount(
+            2, 
+            $employee2_documents
+        );
+        $this->assertTrue(
+                $employee2_documents->every(function ($document) use ($employee2) {
+                return $document->employee_id === $employee2->id;
+            })
+        );
+        
+        $all_documents = $this->allDocuments();
+        $this->assertCount(
+            5, 
+            $all_documents
+        );
+        
+        $employee1_sees_employee2_documents = $employee1_documents->contains(function ($document) use ($employee2) {
+            return $document->employee_id === $employee2->id;
+        });
+        $this->assertFalse(
+            $employee1_sees_employee2_documents
+        );
+        
+        $employee2_sees_employee1_documents = $employee2_documents->contains(function ($document) use ($employee1) {
+            return $document->employee_id === $employee1->id;
+        });
+        $this->assertFalse(
+            $employee2_sees_employee1_documents
+        );
     }
 }

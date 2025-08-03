@@ -4,15 +4,19 @@ namespace App\Repositories\Entities\Document;
 
 use App\Models\Document;
 use App\Repositories\Contracts\Document\IDocumentRepository;
+use App\Repositories\Entities\Notebook\NotebookRepository;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\DB;
 
 class DocumentRepository implements IDocumentRepository
 {
     protected $model;
+    protected $notebookRepository;
 
     public function __construct()
     {
+        $this->notebookRepository = new NotebookRepository();
         $this->model = new Document();
     }
     
@@ -73,36 +77,63 @@ class DocumentRepository implements IDocumentRepository
 
     public function create(array $params = [])
     {
-        if (empty($params)) {
-            return null;
-        }
-
-        if (!isset($params['user_id'])) {
-            return null;
-        }
+        DB::beginTransaction();
 
         try {
-            return $this->model->create($params);
+            $document = $this->model->create($params);
+
+            if (
+                !is_null($document) 
+                && isset(
+                    $params['notebook_id'],
+                    $params['accessories_ids']
+                    )
+            ) {
+                $this->syncAccessoriesToNotebook(
+                    $params['notebook_id'], 
+                    $params['accessories_ids']
+                );
+            }
+
+            DB::commit();
+            return $document;
         } catch (\Throwable $th) {
-            \Log::info($th->getMessage());
+            DB::rollBack();
+            \Log::error($th->getMessage());
             return null;
         }
     }
 
-    public function update(int $id)
+    public function update(int $id, array $params)
     {
-        if (is_null($id)) {
+        DB::beginTransaction();
+
+        try {
+            $document = $this->findDocumentById($id);
+
+            if (!$document) {
+                return null;
+            }
+
+            $document->update($params);
+
+            if (
+                isset($document->notebook_id, 
+                $params['accessories_ids'])
+            ) {
+                $this->syncAccessoriesToNotebook(
+                    $document->notebook_id, 
+                    $params['accessories_ids']
+                );
+            }
+
+            DB::commit();
+            return $document;
+        } catch (\Throwable $th) {
+            DB::rollBack();
+            \Log::error($th->getMessage());
             return null;
         }
-
-        $document = $this->find($id);
-
-        if (is_null($document)) {
-            return null;
-        }
-
-        $document->update($data);
-        return $document;
     }
 
     public function delete($id): bool
@@ -122,4 +153,15 @@ class DocumentRepository implements IDocumentRepository
         return $document->delete();
     }
 
+    protected function syncAccessoriesToNotebook($notebook_id, array $accessories_ids)
+    {
+        $notebook = $this->notebookRepository
+            ->findNotebookById(
+                $notebook_id
+            );
+
+        if (!is_null($notebook)) {
+            $notebook->accessories()->sync($accessories_ids);
+        }
+    }
 }

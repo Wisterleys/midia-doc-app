@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Database\Seeders\TestUserSeeder;
 use Database\Seeders\NotebookSeeder;
+use Database\Seeders\AccessorySeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -18,6 +19,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             TestUserSeeder::class,
             NotebookSeeder::class,
+            AccessorySeeder::class,
         ]);
     }
 }

@@ -82,6 +82,11 @@ abstract class TestCase extends BaseTestCase
         $this->artisan('db:seed', ['--class' => 'NotebookSeeder']);
     }
 
+    protected function seedTestAccessory(): void
+    {
+        $this->artisan('db:seed', ['--class' => 'AccessorySeeder']);
+    }
+
     /**
      * Mocking
      */
