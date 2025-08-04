@@ -30,6 +30,12 @@ class RepositoryServiceProvider extends ServiceProvider
             \App\Repositories\Contracts\Notebook\INotebookRepository::class,
             \App\Repositories\Entities\Notebook\NotebookRepository::class
         );
+
+        // Accessory
+        $this->app->bind(
+            \App\Repositories\Contracts\Accessory\IAccessoryRepository::class,
+            \App\Repositories\Entities\Accessory\AccessoryRepository::class
+        );
     }
 
     /**

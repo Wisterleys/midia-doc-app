@@ -19,6 +19,7 @@ Route::middleware(['auth','verified'])->group(function () {
     Route::get('/document/{id}/edit', [DocumentController::class, 'edit'])->name('documents.edit');
     Route::patch('/document/{id}/update', [DocumentController::class, 'update'])->name('documents.update');
     Route::delete('/document/{id}/destroy', [DocumentController::class, 'destroy'])->name('documents.destroy');
+    Route::get('/documents/{id}/download/{format}', [DocumentController::class, 'downloadFilledDocument'])->name('documents.download');
 });
 
 require __DIR__.'/auth.php';

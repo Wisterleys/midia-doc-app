@@ -22,7 +22,7 @@ class NotebookSeeder extends Seeder
                 'memory' => 8,
                 'disk' => 512,
                 'price' => 3899.90,
-                'price_string' => 'R$ 3.899,90',
+                'price_string' => 'Três mil, oitocentos e noventa e nove reais e noventa centavos',
             ],
             [
                 'brand' => 'HP',
@@ -32,7 +32,7 @@ class NotebookSeeder extends Seeder
                 'memory' => 16,
                 'disk' => 1024,
                 'price' => 5699.00,
-                'price_string' => 'R$ 5.699,00',
+                'price_string' => 'Cinco mil, seiscentos e noventa e nove reais',
             ],
             [
                 'brand' => 'Lenovo',
@@ -42,7 +42,7 @@ class NotebookSeeder extends Seeder
                 'memory' => 8,
                 'disk' => 256,
                 'price' => 3149.50,
-                'price_string' => 'R$ 3.149,50',
+                'price_string' => 'Três mil, cento e quarenta e nove reais e cinquenta centavos',
             ],
             [
                 'brand' => 'Apple',
@@ -52,7 +52,7 @@ class NotebookSeeder extends Seeder
                 'memory' => 8,
                 'disk' => 256,
                 'price' => 8999.99,
-                'price_string' => 'R$ 8.999,99',
+                'price_string' => 'Oito mil, novecentos e noventa e nove reais e noventa e nove centavos',
             ],
             [
                 'brand' => 'Acer',
@@ -62,7 +62,7 @@ class NotebookSeeder extends Seeder
                 'memory' => 4,
                 'disk' => 128,
                 'price' => 2399.00,
-                'price_string' => 'R$ 2.399,00',
+                'price_string' => 'Dois mil, trezentos e noventa e nove reais',
             ],
             [
                 'brand' => 'Asus',
@@ -72,7 +72,7 @@ class NotebookSeeder extends Seeder
                 'memory' => 16,
                 'disk' => 512,
                 'price' => 4690.75,
-                'price_string' => 'R$ 4.690,75',
+                'price_string' => 'Quatro mil, seiscentos e noventa reais e setenta e cinco centavos',
             ],
             [
                 'brand' => 'Samsung',
@@ -82,7 +82,7 @@ class NotebookSeeder extends Seeder
                 'memory' => 8,
                 'disk' => 256,
                 'price' => 4199.00,
-                'price_string' => 'R$ 4.199,00',
+                'price_string' => 'Quatro mil, cento e noventa e nove reais',
             ],
             [
                 'brand' => 'Lenovo',
@@ -92,7 +92,7 @@ class NotebookSeeder extends Seeder
                 'memory' => 16,
                 'disk' => 512,
                 'price' => 6090.90,
-                'price_string' => 'R$ 6.090,90',
+                'price_string' => 'Seis mil, noventa reais e noventa centavos',
             ],
             [
                 'brand' => 'HP',
@@ -102,7 +102,7 @@ class NotebookSeeder extends Seeder
                 'memory' => 8,
                 'disk' => 256,
                 'price' => 4790.00,
-                'price_string' => 'R$ 4.790,00',
+                'price_string' => 'Quatro mil, setecentos e noventa reais',
             ],
             [
                 'brand' => 'Dell',
@@ -112,7 +112,7 @@ class NotebookSeeder extends Seeder
                 'memory' => 4,
                 'disk' => 256,
                 'price' => 2999.00,
-                'price_string' => 'R$ 2.999,00',
+                'price_string' => 'Dois mil, novecentos e noventa e nove reais',
             ],
         ];
 
