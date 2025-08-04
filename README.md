@@ -125,7 +125,7 @@ A modelagem do banco de dados foi realizada com base nos requisitos do teste té
 *   **Employees**: Relacionado a `Users`, armazena informações detalhadas do funcionário (nome, CPF, função) que será o responsável pelo termo.
 *   **Notebooks**: Armazena os dados dos notebooks (marca, modelo, número de série, processador, memória, disco, preço).
 *   **Accessories**: Armazena os dados dos acessórios (nome, descrição, marca).
-*   **Documents**: Tabela central que representa o termo de responsabilidade. Contém campos como `employee_id`, `notebook_id`, `local`, `date` e se relaciona com `Accessories` através de uma tabela pivô (`document_accessory`) para gerenciar os acessórios associados a cada documento.
+*   **Documents**: Tabela central que representa o termo de responsabilidade. Contém campos como `employee_id` e `notebook_id`, relacionando-se com `Employees` e `Notebooks` respectivamente. Os acessórios são associados aos `Notebooks` através da tabela pivô `accessory_notebook`, e não diretamente aos `Documents`.
 
 Essa estrutura permite uma gestão flexível e escalável dos dados, facilitando a recuperação e a associação de informações para a geração dos termos.
 
