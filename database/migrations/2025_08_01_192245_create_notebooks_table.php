@@ -20,7 +20,7 @@ return new class extends Migration
             $table->integer('memory');
             $table->integer('disk');
             $table->decimal('price', 10, 2);
-            $table->string('price_string', 45);
+            $table->string('price_string', 120);
             $table->timestamps();
         });
 

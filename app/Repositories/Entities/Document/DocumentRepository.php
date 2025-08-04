@@ -53,10 +53,17 @@ class DocumentRepository implements IDocumentRepository
                                        ->orWhere('serial_number', 'like', "%{$search_term}%");
                     })
                     ->orWhereHas('employee', function (Builder $employee_query) use ($search_term) {
-                        $employee_query->where('cpf', 'like', "%{$search_term}%")
-                                      ->orWhere('name', 'like', "%{$search_term}%")
-                                      ->orWhere('role', 'like', "%{$search_term}%");
-                  });
+                        $employee_query->where(function (Builder $query) use ($search_term) {
+                            if (preg_match('/^(\d{3}\.?\d{3}\.?\d{3}-?\d{2}|\d{11})$/', $search_term)) {
+                                $formatted_cpf = $this->formatCpfWithMask($search_term);
+                                $query->orWhere('cpf', 'like', "%{$formatted_cpf}%");
+                            }
+
+                            $query->orWhere('name', 'like', "%{$search_term}%")
+                                ->orWhere('role', 'like', "%{$search_term}%");
+                        });
+                    });
+
             });
         }
 
@@ -66,10 +73,10 @@ class DocumentRepository implements IDocumentRepository
         return $query;
     }
 
-    public function findDocumentById(int $id)
+    public function findDocumentById(int $id, array $with = [])
     {
         try {
-            return $this->model->findOrFail($id);
+            return $this->model->with($with)->findOrFail($id);
         } catch (\Throwable $th) {
             return null;
         }
@@ -163,5 +170,19 @@ class DocumentRepository implements IDocumentRepository
         if (!is_null($notebook)) {
             $notebook->accessories()->sync($accessories_ids);
         }
+    }
+
+    private function formatCpfWithMask(string $cpf): string
+    {
+        $digitos = preg_replace('/[^0-9]/', '', $cpf);
+
+        if (strlen($digitos) === 11) {
+            return substr($digitos, 0, 3) . '.' . 
+                substr($digitos, 3, 3) . '.' . 
+                substr($digitos, 6, 3) . '-' . 
+                substr($digitos, 9, 2);
+        }
+
+        return $cpf;
     }
 }

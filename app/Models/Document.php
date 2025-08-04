@@ -13,6 +13,10 @@ class Document extends Model
         'employee_id', 'notebook_id', 'local', 'date'
     ];
 
+    protected $casts = [
+        'date' => 'datetime'
+    ];
+    
     public function employee()
     {
         return $this->belongsTo(\App\Models\Employee::class);
